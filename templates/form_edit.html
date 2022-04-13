@@ -1,0 +1,331 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <button 
+                    type="button"
+                    class="btn btn-primary mr-1" 
+                    data-toggle="modal" 
+                    data-target="#scrollable-modal"> 
+                    <i class="fas fa-chalkboard"></i> Add new section
+                </button>
+                <button
+                    type="button"
+                    data-toggle="modal" 
+                    data-target="#question-modal" 
+                    class="btn btn-info mr-1">
+                    <i class="fas fa-question"></i> Add new question
+                </button>
+                <a href="{{ url_for('forms') }}" class="btn btn-dark">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+            <h4 class="page-title text-warning">Edit form - {{ title }}</h4>
+        </div>
+    </div>
+</div>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title mb-4"> ({{ sections|length }}) Sections in '{{ title }}'</h4>
+
+                {% if sections %}
+                    {% for section in sections %}
+                        <div class="row">
+                            <div class="col">
+                                <div class="card">
+                                    <div class="card-body">
+                                        
+                                        <div class="row mb-4">
+                                            <div class="col-md-6">
+                                                <h4 class="header-title"> {{ section.section_title }} </h4>
+                                                <p class="text-muted"> {{ section.section_description }} </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="text-sm-right">
+                                                    {% if section.section_type != 'type_a' %}
+                                                        <button 
+                                                            type="button"
+                                                            class="btn btn-danger mr-1" 
+                                                            data-toggle="modal" 
+                                                            data-target="#key-modal">
+                                                            <i class="fas fa-plus"></i> Add default keys
+                                                        </button>
+
+                                                        <button 
+                                                            type="button"
+                                                            class="btn btn-secondary mr-1" 
+                                                            data-toggle="modal" 
+                                                            data-target="#value-modal">
+                                                            <i class="fas fa-plus"></i> Add default value
+                                                        </button>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                        
+                                        {% if section.questions %}
+                                            {% if section.section_type == 'type_a' %}
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                {% for question in section.questions %}
+                                                                    <th>{{ question.question_title }}</th>
+                                                                {% endfor %}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <form action="#!" method="post">
+                                                                    {% for question in section.questions %}
+                                                                        <td><input type="{{ question.answer_type }}"></td>
+                                                                    {% endfor %}
+                                                                </form>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% else %}
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            {% for default in section.defaults_keys %}
+                                                                <th>{{ default.key_name }}</th>
+                                                            {% endfor %}
+                                                            {% for question in section.questions %}
+                                                                <th>{{ question.question_title }}</th>
+                                                            {% endfor %}
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for default in section.defaults_keys %}
+                                                                <tr>
+                                                                    {% for value in default["values"] %}
+                                                                        <td>{{ value }}</td>
+                                                                    {% endfor %}
+                                                                    <form action="#!" method="post">
+                                                                        {% for question in section.questions %}
+                                                                            <td><input type="{{ question.answer_type }}"></td>
+                                                                        {% endfor %}
+                                                                    </form>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add secion modal -->
+<div class="modal fade" id="scrollable-modal" tabindex="-1" role="dialog" aria-labelledby="scrollableModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scrollableModalTitle">Add new section to form</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('form_edit', form_id=form.form_id) }}" method="post">
+
+                    <input type="hidden" name="type" value="section">
+
+                    <div class="mb-3">
+                        <label>Title</label>
+                        <input 
+                            type="text" 
+                            name="section_title" 
+                            class="form-control" required placeholder="Provide a tile for the section">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="example-select" class="form-label">Section Type</label>
+                        <select class="form-control" name="section_type">
+                            <option value="type_a">Default Table</option>
+                            <option value="type_b">Repeating Measurements Table</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Description</label>
+                        <textarea 
+                            class="form-control" 
+                            name="section_description" cols="30" rows="5" required placeholder="Write something"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create section</button>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Add question modal -->
+<div class="modal fade" id="question-modal" tabindex="-1" role="dialog" aria-labelledby="questionModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionModalTitle">Add new question to a section</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('form_edit', form_id=form.form_id) }}" method="post">
+
+                    <input type="hidden" name="type" value="question">
+
+                    <div class="mb-3">
+                        <label for="example-select" class="form-label">Section to be added to</label>
+                        <select class="form-control" name="section_id">
+                            {% if sections %}
+                                {% for section in sections %}
+                                    <option value="{{ section.section_id }}">{{ section.section_title }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Title</label>
+                        <input 
+                            type="text" 
+                            name="question_title" 
+                            class="form-control" required placeholder="Provide a short title for the question">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="example-select" class="form-label">Answer type</label>
+                        <select class="form-control" name="answer_type">
+                            <option value="number">Number</option>
+                            <option value="text">Text</option>
+                            <option value="datetime-local">Date and time</option>
+                            <option value="file">File</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create question</button>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Add default key modal -->
+<div class="modal fade" id="key-modal" tabindex="-1" role="dialog" aria-labelledby="keyModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="keyModalTitle">Add a new default key to a section</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('add_defaults', form_id=form.form_id) }}" method="post">
+
+                    <input type="hidden" name="type" value="key">
+
+                    <div class="mb-3">
+                        <label for="example-select" class="form-label">Section to be added to</label>
+                        <select class="form-control" name="section_id">
+                            {% if sections %}
+                                {% for section in sections %}
+                                    <option value="{{ section.section_id }}">{{ section.section_title }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Title</label>
+                        <input 
+                            type="text" 
+                            name="default_title" 
+                            class="form-control" required placeholder="Provide a short title for the default key (e.g First Name)">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create default</button>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Add default vale modal -->
+<div class="modal fade" id="value-modal" tabindex="-1" role="dialog" aria-labelledby="valueModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="valueModalTitle">Add a new default value to a section</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('add_defaults', form_id=form.form_id) }}" method="post">
+
+                    <input type="hidden" name="type" value="value">
+
+                    <div class="mb-3">
+                        <label for="example-select" class="form-label">Section to be added to</label>
+                        <select class="form-control" name="section_id">
+                            {% if sections %}
+                                {% for section in sections %}
+                                    <option value="{{ section.section_id }}">{{ section.section_title }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="example-select" class="form-label">Default key to be added to</label>
+                        <select class="form-control" name="key_name">
+                            {% if sections %}
+                                {% for section in sections %}
+                                    {% for default in section.defaults_keys %}
+                                        <option value="{{ default.key_name }}">
+                                            {{ section.section_title }} - {{ default.key_name }}
+                                        </option>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Value</label>
+                        <input 
+                            type="text" 
+                            name="default_value" 
+                            class="form-control" required placeholder="Provide the new default value">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Add default value</button>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% endblock content %}

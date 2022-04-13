@@ -1,0 +1,10 @@
+[
+    {
+        "type": "text",
+        "constraints": [
+            {"min": "number"},
+            {"max": "number"}
+        ],
+        "defaults": []
+    }
+]

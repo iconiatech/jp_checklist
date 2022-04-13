@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <a href="{{ url_for('forms') }}" class="btn btn-dark">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+            <h4 class="page-title">Fill - {{ title }} - ({{ sections|length }}) Sections</h4>
+        </div>
+    </div>
+</div>
+<!-- end page title -->
+
+{% if sections %}
+    {% for section in sections %}
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="header-title"> {{ section.section_title }} </h4>
+                        <p class="text-muted"> {{ section.section_description }} </p>
+        
+                        {% if section.questions %}
+                            {% if section.section_type == 'type_a' %}
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                {% for question in section.questions %}
+                                                    <th>{{ question.question_title }}</th>
+                                                {% endfor %}
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <form>
+                                                    {% for question in section.questions %}
+                                                        <td><input type="{{ question.answer_type }}"></td>
+                                                    {% endfor %}
+                                                    <td class="table-action">
+                                                        <button 
+                                                        class="action-icon my-button"> <i class="fas fa-upload text-warning"></i></button>
+                                                    </td>
+                                                </form>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            {% for default in section.defaults_keys %}
+                                                <th>{{ default.key_name }}</th>
+                                            {% endfor %}
+                                            {% for question in section.questions %}
+                                                <th>{{ question.question_title }}</th>
+                                            {% endfor %}
+                                            <th>Action</th>
+                                        </thead>
+                                        <tbody>
+                                            {% for default in section.defaults_keys %}
+                                                <tr>
+                                                    {% for value in default["values"] %}
+                                                        <td>{{ value }}</td>
+                                                    {% endfor %}
+                                                    <form action="#!" method="post">
+                                                        {% for question in section.questions %}
+                                                            <td><input type="{{ question.answer_type }}"></td>
+                                                        {% endfor %}
+                                                        <td class="table-action">
+                                                            <button 
+                                                            class="action-icon my-button"> <i class="fas fa-upload text-warning"></i></button>
+                                                        </td>
+                                                    </form>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+        
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% endblock content %}

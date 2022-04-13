@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <button 
+                    type="button" 
+                    class="btn btn-info" 
+                    data-toggle="modal" data-target="#create-modal">
+                    <i class="fas fa-plus"></i> Add New Form</button>
+            </div>
+            <h4 class="page-title">{{ title }}</h4>
+            <p class="mb-4">Press the '<i class="fas fa-eye text-primary"></i>' 
+                button on a specific form to be able to fill in the details and submit it.
+                    </p>
+        </div>
+    </div>
+</div>     
+<!-- end page title -->
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h5 class="m-0 font-weight-bold text-primary">All Forms</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Form title</th>
+                        <th>Created by</th>
+                        <th>Date created</th>
+                        <th>Next due</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Form title</th>
+                        <th>Created by</th>
+                        <th>Date created</th>
+                        <th>Next due</th>
+                        <th>Action</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+
+                    {% for form in forms %}
+                        <tr>
+                            <td>{{ form.form_title }}</td>
+                            <td>{{ form.created_by }}</td>
+                            <td>{{ form.created_on }}</td>
+                            <td>{{ form.next_due }}</td>
+                            <td class="table-action">
+                                <a href="{{ url_for('form_fill', form_id=form.form_id) }}"
+                                class="action-icon mr-1"> <i class="fas fa-eye"></i></a>
+                                <a href="{{ url_for('form_edit', form_id=form.form_id) }}"
+                                class="action-icon"> <i class="fas fa-edit text-warning"></i></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Create new form modal -->
+<div id="create-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title" id="myLargeModalLabel">Create new form</h4>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <form action="{{ url_for('form_create') }}" method="post" class="ps-3 pe-3">
+
+                    <div class="mb-3">
+                        <label for="form-title" class="form-label">Form title</label>
+                        <input 
+                            name="form-title" 
+                            class="form-control" 
+                            type="text" id="form-title" required placeholder="Form title">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Form description</label>
+                        <textarea 
+                            name="description" 
+                            id="description" 
+                            placeholder="Write something..."
+                            required
+                            cols="30" rows="5" class="form-control"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input 
+                                name="tabbed-section"
+                                type="checkbox" 
+                                class="form-check-input" id="customCheck2">
+                            <label class="form-check-label" for="customCheck2">Tabbed sections</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 text-center">
+                        <button class="btn rounded-pill btn-primary" type="submit">
+                            <i class="fas fa-plus"></i> Create new</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% endblock content %}
