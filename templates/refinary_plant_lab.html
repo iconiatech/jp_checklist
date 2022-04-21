@@ -1,0 +1,361 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back 
+                </a>
+            </div>
+            <h4 class="page-title">{{ title }}</h4>
+        </div>
+    </div>
+</div>     
+<!-- end page title -->
+
+<!-- Refinary plant lab report -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h4 class="header-title text-primary">Submitted Reports</h4>
+                        <p class="text-muted">The table shows all the previously submitted lab reports.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-sm-right">
+                            <button  type="button" class="btn btn-primary" data-toggle="modal" data-target="#scrollable-modal"> <i class="fas fa-plus"></i> Add New</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="theaders">Time</th>
+                                <th class="theaders">% FFA-specs-0.065%max- Palm oil, Sunflower and Soybean oil 0.09 % max- Corn oil</th>
+                                <th class="theaders">RED-specs -3.0max -Palm oil   1.0max-S/flwr 2.0 max-Corn &  Soybean oils</th>
+                                <th class="theaders">YELLOW-specs 70 max-Palm  10 max S/flwr  15 max-Corn & S/bean</th>
+                                <th class="theaders">ODOUR-characteristic of specific oil</th>
+                                <th class="theaders">VISIBLE IMP-Nil</th>
+                                <th class="theaders">FLOW RATE-L/HR</th>
+                                <th class="theaders">FINAL OIL TEMP, °C 60-70-P1   35-50- P2</th>
+                                <th class="theaders">% FFA-   2.5 min-P1  0.2max -P2</th>
+                                <th class="theaders">RED-70 max</th>
+                                <th class="theaders">VISIBLE IMP-Nil</th>
+                                <th class="theaders">BLEACH TEMP°C  100-115</th>
+                                <th class="theaders">DEOD TEMP°C 250-275-P1>260-P2</th>
+                                <th class="theaders">Comments</th>
+                                <th class="theaders">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if lab_reports %}
+                                {% for report in lab_reports %}
+                                    {% if report.approved == 'approved' %}
+                                        <tr class="bg-success text-white">
+                                            <td>{{ report.time }}</td>
+                                            <td>{{ report.ffa_specs }}</td>
+                                            <td>{{ report.red_specs }}</td>
+                                            <td>{{ report.yellow_specs }}</td>
+                                            <td>{{ report.odour }}</td>
+                                            <td>{{ report.visible_imp_1 }}</td>
+                                            <td>{{ report.flow_rate }}</td>
+                                            <td>{{ report.final_oil_temp }}</td>
+                                            <td>{{ report.ffa }}</td>
+                                            <td>{{ report.red_70 }}</td>
+                                            <td>{{ report.visible_imp_2 }}</td>
+                                            <td>{{ report.bleach_temp }}</td>
+                                            <td>{{ report.deod_temp }}</td>
+                                            <td>{{ report.comments }}</td>
+                                            <td class="table-action">
+                                                <a
+                                                    class="action-icon"
+                                                    title="Approve or reject report"
+                                                    href="{{ url_for('approve_refinary_plant_lab', report_id=report.report_id) }}"
+                                                > <i class="fas fa-clipboard text-white"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% elif report.approved == 'reject' %}
+                                        <tr class="bg-danger text-white" title="Rejection note: {{ report.approve_note }}">
+                                            <td>{{ report.time }}</td>
+                                            <td>{{ report.ffa_specs }}</td>
+                                            <td>{{ report.red_specs }}</td>
+                                            <td>{{ report.yellow_specs }}</td>
+                                            <td>{{ report.odour }}</td>
+                                            <td>{{ report.visible_imp_1 }}</td>
+                                            <td>{{ report.flow_rate }}</td>
+                                            <td>{{ report.final_oil_temp }}</td>
+                                            <td>{{ report.ffa }}</td>
+                                            <td>{{ report.red_70 }}</td>
+                                            <td>{{ report.visible_imp_2 }}</td>
+                                            <td>{{ report.bleach_temp }}</td>
+                                            <td>{{ report.deod_temp }}</td>
+                                            <td>{{ report.comments }}</td>
+                                            <td class="table-action">
+                                                <a
+                                                    class="action-icon mr-1"
+                                                    title="Approve or reject report"
+                                                    href="{{ url_for('approve_refinary_plant_lab', report_id=report.report_id) }}"
+                                                > <i class="fas fa-clipboard text-white"></i></a>
+                                                <a
+                                                    class="action-icon"
+                                                    title="Edit report"
+                                                    href="{{ url_for('edit_refinary_plant_lab', report_id=report.report_id) }}"
+                                                > <i class="fas fa-edit text-white"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td>{{ report.time }}</td>
+                                            <td>{{ report.ffa_specs }}</td>
+                                            <td>{{ report.red_specs }}</td>
+                                            <td>{{ report.yellow_specs }}</td>
+                                            <td>{{ report.odour }}</td>
+                                            <td>{{ report.visible_imp_1 }}</td>
+                                            <td>{{ report.flow_rate }}</td>
+                                            <td>{{ report.final_oil_temp }}</td>
+                                            <td>{{ report.ffa }}</td>
+                                            <td>{{ report.red_70 }}</td>
+                                            <td>{{ report.visible_imp_2 }}</td>
+                                            <td>{{ report.bleach_temp }}</td>
+                                            <td>{{ report.deod_temp }}</td>
+                                            <td>{{ report.comments }}</td>
+                                            <td class="table-action">
+                                                <a
+                                                    class="action-icon mr-1"
+                                                    title="Approve or reject report"
+                                                    href="{{ url_for('approve_refinary_plant_lab', report_id=report.report_id) }}"
+                                                > <i class="fas fa-clipboard"></i></a>
+                                                <a
+                                                    class="action-icon"
+                                                    title="Edit report"
+                                                    href="{{ url_for('edit_refinary_plant_lab', report_id=report.report_id) }}"
+                                                > <i class="fas fa-edit text-warning"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end refinary plant lab report -->
+
+<!-- Additional tests report -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title">Additional Tests - {{ title }}</h4>
+                <p class="text-muted mb-4">The table shows all the previously submitted lab reports.</p>
+
+                <div class="row mb-4">
+                    <div class="col">
+                        <form action="#!" method="post">
+
+                            <div class="mb-3">
+                                <label for="additional">Select the test to add</label>
+                                <select name="additional" id="additional" class="form-control">
+                                    <option value="fatty-acid">Fatty Acid Content</option>
+                                    <option value="fatty-acid">Peroxide Value</option>
+                                    <option value="fatty-acid">Insoluble Impurities</option>
+                                </select>
+                            </div>
+
+                            <div class="row">
+                                
+                                <div class="mb-3 col-md-6">
+                                    <label for="time">Time</label>
+                                    <input type="time" id="time" name="time" class="form-control" required>
+                                </div>
+    
+                                <div class="mb-3 col-md-6">
+                                    <label for="analysis">Analysis</label>
+                                    <input type="text" id="analysis" name="analysis" class="form-control" required>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6"></div>
+                                <div class="col-md-6">
+                                    <div class="text-sm-right">
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="fas fa-paper-plane"></i> Submit test</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <hr>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="dataTable2" width="100%" cellspacing="0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Test</th>
+                                <th>Specs</th>
+                                <th>Time</th>
+                                <th>Analysis</th>
+                                <th>Time</th>
+                                <th>Analysis</th>
+                                <th>Time</th>
+                                <th>Analysis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if additional_tests %}
+                                {% for test in additional_tests %}
+                                    <tr>
+                                        <td>{{ test.test }}</td>
+                                        <td>{{ test.specs }}</td>
+                                        <td>{{ test.time1 }}</td>
+                                        <td>{{ test.analysis1 }}</td>
+                                        <td>{{ test.time2 }}</td>
+                                        <td>{{ test.analysis2 }}</td>
+                                        <td>{{ test.time3 }}</td>
+                                        <td>{{ test.analysis3 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end additional tests -->
+
+<!-- Add refinary report modal -->
+<div class="modal fade" id="scrollable-modal" tabindex="-1" role="dialog" aria-labelledby="scrollableModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-full-width">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scrollableModalTitle">Add new refinary plant lab report</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('refinary_plant_lab') }}" method="post">
+
+                    <div class="row">
+
+                        <div class="mb-3 col-md-3">
+                            <span for="time" class="font-12">Time</span>
+                            <input type="time" id="time" name="time" class="form-control" required>
+                        </div>
+    
+                        <div class="mb-3 col-md-5">
+                            <span class="font-12">% FFA-specs-0.065%max- Palm oil, Sunflower and Soybean oil 0.09 % max- Corn oil</span>
+                            <input type="number" id="ffa-specs" name="ffa-specs" class="form-control">
+                        </div>
+    
+                        <div class="mb-3 col-md-4">
+                            <span class="font-12">RED-specs -3.0max -Palm oil 1.0max-S/flwr 2.0 max-Corn &  Soybean oils</span>
+                            <input type="number" id="red-specs" name="red-specs" class="form-control" required>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="mb-3 col-md-4">
+                            <span class="font-12">YELLOW-specs 70 max-Palm  10 max S/flwr  15 max-Corn & S/bean</span>
+                            <input type="number" id="yellow-specs" name="yellow-specs" class="form-control" required>
+                        </div>
+    
+                        <div class="mb-3 col-md-3">
+                            <span class="font-12">ODOUR-characteristic of specific oil</span>
+                            <input type="text" id="odour" name="odour" class="form-control" required>
+                        </div>
+    
+                        <div class="mb-3 col-md-2">
+                            <span class="font-12">VISIBLE IMP-Nil</span>
+                            <input type="text" id="visible-imp-1" name="visible-imp-1" class="form-control">
+                        </div>
+
+                        <div class="mb-3 col-md-3">
+                            <span class="font-12">FLOW
+                                RATE-L/HR</span>
+                            <input type="number" id="flow-rate" name="flow-rate" class="form-control">
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+    
+                        <div class="mb-3 col-md-3">
+                            <span class="font-12">FINAL OIL
+                                TEMP, °C 60-70-P1   35-50- P2</span>
+                            <input type="number" id="final-oil-temp" name="final-oil-temp" class="form-control">
+                        </div>
+    
+                        <div class="mb-3 col-md-3">
+                            <span class="font-12">% FFA-   2.5 min-P1  0.2max -P2</span>
+                            <input type="number" id="ffa" name="ffa" class="form-control">
+                        </div>
+
+                        <div class="mb-3 col-md-3">
+                            <span class="font-12">RED-70 max</span>
+                            <input type="number" id="red-70" name="red-70" class="form-control">
+                        </div>
+
+                        <div class="mb-3 col-md-3">
+                            <span class="font-12">VISIBLE IMP-Nil</span>
+                            <input type="text" id="visible-imp-2" name="visible-imp-2" class="form-control">
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="mb-3 col-md-4">
+                            <span class="font-12">BLEACH TEMP°C  100-115</span>
+                            <input type="number" id="bleach-temp" name="bleach-temp" class="form-control">
+                        </div>
+
+                        <div class="mb-3 col-md-4">
+                            <span class="font-12">DEOD
+                                TEMP°C 250-275-P1>260-P2</span>
+                            <input type="number" id="deod-temp" name="deod-temp" class="form-control">
+                        </div>
+    
+                        <div class="mb-3 col-md-4">
+                            <span class="font-12">Comments</span>
+                            <textarea class="form-control" name="comments" id="comments" cols="30" rows="1"></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <div class="text-sm-right">
+                                <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% endblock content %}

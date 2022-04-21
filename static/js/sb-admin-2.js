@@ -53,4 +53,8 @@
     e.preventDefault();
   });
 
+  $('#custom-accordion-one').on('click', function (e) {
+    console.log("Hello")
+  })
+
 })(jQuery); // End of use strict

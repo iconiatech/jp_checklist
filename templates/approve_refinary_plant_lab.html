@@ -1,0 +1,218 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <a href="{{ url_for('refinary_plant_lab') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back 
+                </a>
+            </div>
+            <h4 class="page-title">{{ title }}</h4>
+        </div>
+    </div>
+</div>     
+<!-- end page title -->
+
+<!-- Refinary plant lab report -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h4 class="header-title text-primary">Report - Submitted by 'Peter Gichia' on '2022-04-19'</h4>
+                        <p class="text-muted">Previously submitted lab reports.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-sm-right">
+                            <button 
+                                type="button"
+                                class="btn btn-info mr-1"
+                                data-toggle="modal"
+                                data-target="#approve-modal"
+                            > 
+                                <i class="fas fa-vote-yea"></i> Approve
+                            </button>
+                            <button 
+                                type="button"
+                                class="btn btn-danger"
+                                data-toggle="modal"
+                                data-target="#reject-modal"
+                            > 
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="mb-3 col-md-3">
+                        <span for="time" class="font-12">Time</span>
+                        <input type="time" id="time" name="time" class="form-control" required value="{{ report.time }}">
+                    </div>
+
+                    <div class="mb-3 col-md-5">
+                        <span class="font-12">% FFA-specs-0.065%max- Palm oil, Sunflower and Soybean oil 0.09 % max- Corn oil</span>
+                        <input type="number" id="ffa-specs" name="ffa-specs" class="form-control" value="{{ report.ffa_specs }}">
+                    </div>
+
+                    <div class="mb-3 col-md-4">
+                        <span class="font-12">RED-specs -3.0max -Palm oil 1.0max-S/flwr 2.0 max-Corn &  Soybean oils</span>
+                        <input type="number" id="red-specs" name="red-specs" class="form-control" required value="{{ report.red_specs }}">
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="mb-3 col-md-4">
+                        <span class="font-12">YELLOW-specs 70 max-Palm  10 max S/flwr  15 max-Corn & S/bean</span>
+                        <input type="number" id="yellow-specs" name="yellow-specs" class="form-control" required value="{{ report.yellow_specs }}">
+                    </div>
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">ODOUR-characteristic of specific oil</span>
+                        <input type="text" id="odour" name="odour" class="form-control" required value="{{ report.odour }}">
+                    </div>
+
+                    <div class="mb-3 col-md-2">
+                        <span class="font-12">VISIBLE IMP-Nil</span>
+                        <input type="text" id="visible-imp-1" name="visible-imp-1" class="form-control" value="{{ report.visible_imp_1 }}">
+                    </div>
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">FLOW
+                            RATE-L/HR</span>
+                        <input type="number" id="flow-rate" name="flow-rate" class="form-control" value="{{ report.flow_rate }}">
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">FINAL OIL
+                            TEMP, °C 60-70-P1   35-50- P2</span>
+                        <input type="number" id="final-oil-temp" name="final-oil-temp" class="form-control" value="{{ report.final_oil_temp }}">
+                    </div>
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">% FFA-   2.5 min-P1  0.2max -P2</span>
+                        <input type="number" id="ffa" name="ffa" class="form-control" value="{{ report.ffa }}">
+                    </div>
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">RED-70 max</span>
+                        <input type="number" id="red-70" name="red-70" class="form-control" value="{{ report.red_70 }}">
+                    </div>
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">VISIBLE IMP-Nil</span>
+                        <input type="text" id="visible-imp-2" name="visible-imp-2" class="form-control" value="{{ report.visible_imp_2 }}">
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="mb-3 col-md-4">
+                        <span class="font-12">BLEACH TEMP°C  100-115</span>
+                        <input type="number" id="bleach-temp" name="bleach-temp" class="form-control" value="{{ report.bleach_temp }}">
+                    </div>
+
+                    <div class="mb-3 col-md-4">
+                        <span class="font-12">DEOD
+                            TEMP°C 250-275-P1>260-P2</span>
+                        <input type="number" id="deod-temp" name="deod-temp" class="form-control" value="{{ report.deod_temp }}">
+                    </div>
+
+                    <div class="mb-3 col-md-4">
+                        <span class="font-12">Comments</span>
+                        <textarea class="form-control" name="comments" id="comments" cols="30" rows="1">{{ report.comments }}</textarea>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end refinary plant lab report -->
+
+<!-- Reject refinary report modal -->
+<div 
+    class="modal fade"
+    id="reject-modal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="rejectModalTitle" 
+    aria-hidden="true"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-danger">
+                <h5 class="modal-title" id="rejectModalTitle">Reject refinary plant lab report</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('approve_refinary_plant_lab', report_id=report.report_id) }}" method="post">
+                    <input type="hidden" name="approve" value="rejected">
+
+                    <div class="mb-3">
+                        <span class="font-12">Rejection message</span>
+                        <textarea name="note" id="" cols="30" rows="5" class="form-control" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Approve refinary report modal -->
+<div 
+    class="modal fade"
+    id="approve-modal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="approveModalTitle" 
+    aria-hidden="true"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-colored-header bg-info">
+                <h5 class="modal-title" id="approveModalTitle">Approve refinary plant lab report</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body p-4">
+                    <div class="text-center">
+                        <i class="fas fa-info h1 text-info"></i>
+                        <h4 class="mt-2">Heads up!</h4>
+                        <p class="mt-3">If you are certain of the process press 'Approve' button to accept.</p>
+                        <form action="{{ url_for('approve_refinary_plant_lab', report_id=report.report_id) }}" method="post">
+                            <input type="hidden" name="approve" value="approved">
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-info"></i> Approve
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% endblock content %}

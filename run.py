@@ -2,7 +2,10 @@
 
 """
 
+import json
+
 from datetime import datetime
+from slugify import slugify
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask import (
@@ -36,54 +39,23 @@ login_manager = LoginManager(app=app)
 login_manager.login_view = "login"
 login_manager.login_message_category = "warning"
 
-all_sections = []
-all_forms = [
+all_reports = [
     {
-        "form_id": 1, 
-        "form_title": "Refinary Plant Lab Report",
-        "form_tabbed": False,
-        "created_by": "petergich", "next_due": "2021-12-12 20:00",
-        "created_on": "2021-12-12",
+        "name": "Refinary Plant Laboratory Report",
+        "department": "Plants",
+        "date_created": "2022-04-12",
+        "report_uri": "/reports/1"
+    },
+    {
+        "name": "Fractionation Plant Laboratory Report",
+        "department": "Plants",
+        "date_created": "2022-04-12",
+        "report_uri": "/reports/2",
     },
 ]
-all_lab_reports = [
-    {
-        "time": "", "ffa_specs": "", "red_specs": "",
-        "yellow_specs": "", "odour": "", "visible_imp_1": "",
-        "flow_rate": "", "final_oil_temp": "", "ffa": "",
-        "red_70": "", "visible_imp_2": "", "bleach_temp": "",
-        "deod_temp": "", "comments": "", "report_id": 0,
-    },
-    {
-        "time": "", "ffa_specs": "", "red_specs": "",
-        "yellow_specs": "", "odour": "", "visible_imp_1": "",
-        "flow_rate": "", "final_oil_temp": "", "ffa": "",
-        "red_70": "", "visible_imp_2": "", "bleach_temp": "",
-        "deod_temp": "", "comments": "", "report_id": 1,
-    },
-    {
-        "time": "", "ffa_specs": "", "red_specs": "",
-        "yellow_specs": "", "odour": "", "visible_imp_1": "",
-        "flow_rate": "", "final_oil_temp": "", "ffa": "",
-        "red_70": "", "visible_imp_2": "", "bleach_temp": "",
-        "deod_temp": "", "comments": "", "report_id": 2,
-    },
-    {
-        "time": "", "ffa_specs": "", "red_specs": "",
-        "yellow_specs": "", "odour": "", "visible_imp_1": "",
-        "flow_rate": "", "final_oil_temp": "", "ffa": "",
-        "red_70": "", "visible_imp_2": "", "bleach_temp": "",
-        "deod_temp": "", "comments": "", "report_id": 3,
-    },
-    {
-        "time": "", "ffa_specs": "", "red_specs": "",
-        "yellow_specs": "", "odour": "", "visible_imp_1": "",
-        "flow_rate": "", "final_oil_temp": "", "ffa": "",
-        "red_70": "", "visible_imp_2": "", "bleach_temp": "",
-        "deod_temp": "", "comments": "", "report_id": 4,
-    },
-]
-additional_tests = [
+
+refinary_lab_reports = []
+refinary_additional_tests = [
     {
         "test_id": 0,
         "test": "FATTY ACID CONTENT %",
@@ -129,7 +101,6 @@ additional_tests = [
         "analysis3": "",
     },
 ]
-
 
 class User(db.Model, UserMixin):
     """
@@ -260,304 +231,258 @@ def index():
 
     """
 
-    additional_tests.sort(key=lambda x: x.get("test_id"), reverse=False)
-    all_lab_reports.sort(key=lambda x: x.get("report_id"), reverse=False)
-
     return render_template(
         "home.html",
-        lab_reports=all_lab_reports,
-        additional_tests=additional_tests,
-        title="REFINERY PLANT LABORATORY REPORT",
+        all_reports=all_reports,
+        title="All Reports",
     )
 
-@app.route("/lab_reports", methods=["POST", "GET"])
+@app.route("/reports/1", methods=["GET", "POST"])
 @login_required
-def lab_reports():
+def refinary_plant_lab():
     """
-
+    
     """
-
-    if request.method == "POST":
-
-        error = ""
-        current_date = datetime.now()
-        form_data = dict(request.form)
-
-        if "additional" in form_data:
-            if "test-id" not in form_data:
-                error = "Please select the test to be added."
-
-            if error:
-                flash(error, "danger")
-                return redirect(url_for("index"))
-
-            additional_tests.sort(key=lambda x: x.get("test_id"), reverse=False)
-
-            current_test = additional_tests[int(form_data["test-id"])]
-
-            current_test["time1"] = form_data["time1"]
-            current_test["time2"] = form_data["time2"]
-            current_test["time3"] = form_data["time3"]
-
-            current_test["analysis1"] = form_data["analysis1"]
-            current_test["analysis2"] = form_data["analysis2"]
-            current_test["analysis3"] = form_data["analysis3"]
-
-        else:
-            lab_report = dict(
-                            report_id=len(all_lab_reports) + 1,
-                            time=form_data["time"],
-                            ffa_specs=form_data["ffa-specs"],
-                            red_specs=form_data["red-specs"],
-                            yellow_specs=form_data["yellow-specs"],
-                            odour=form_data["odour"],
-                            visible_imp_1=form_data["visible-imp-1"],
-                            flow_rate=form_data["flow-rate"],
-                            final_oil_temp=form_data["final-oil-temp"],
-                            ffa=form_data["ffa"],
-                            red_70=form_data["red-70"],
-                            visible_imp_2=form_data["visible-imp-2"],
-                            bleach_temp=form_data["bleach-temp"],
-                            deod_temp=form_data["deod-temp"],
-                            comments=form_data["comments"],
-                            date_created=current_date,
-                        )
-
-            all_lab_reports.append(lab_report)
-
-    flash("New lab report added!", "success")
-    return redirect(url_for("index"))
-
-@app.route("/update_reports", methods=["POST"])
-@login_required
-def update_reports():
 
     if request.method == "POST":
 
         form_data = dict(request.form)
 
-        print(form_data)
+        current_report = {}
 
-        all_lab_reports.sort(key=lambda x: x.get("report_id"), reverse=False)
-        current_report = all_lab_reports[int(form_data["report-id"])]
-
+        current_report["approved"] = ""
+        current_report["approve_note"] = ""
+        current_report["ffa"] = form_data["ffa"]
         current_report["time"] = form_data["time"]
+        current_report["odour"] = form_data["odour"]
+        current_report["red_70"] = form_data["red-70"]
         current_report["ffa_specs"] = form_data["ffa-specs"]
         current_report["red_specs"] = form_data["red-specs"]
-        current_report["yellow_specs"] = form_data["yellow-specs"]
-        current_report["odour"] = form_data["odour"]
         current_report["flow_rate"] = form_data["flow-rate"]
+        current_report["yellow_specs"] = form_data["yellow-specs"]
+        current_report["report_id"] = len(refinary_lab_reports) + 1
         current_report["final_oil_temp"] = form_data["final-oil-temp"]
-        current_report["ffa"] = form_data["ffa"]
-        current_report["red_70"] = form_data["red-70"]
         current_report["visible_imp_2"] = form_data["visible-imp-2"]
         current_report["bleach_temp"] = form_data["bleach-temp"]
         current_report["deod_temp"] = form_data["deod-temp"]
         current_report["comments"] = form_data["comments"]
 
-    flash("Plant lab report updated!", "warning")
-    return redirect(url_for("index"))
+        refinary_lab_reports.append(current_report)
 
-@app.route("/forms", methods=["GET"])
+        flash("Plant lab report added!", "warning")
+        return redirect(url_for("refinary_plant_lab"))
+
+    return render_template(
+        "refinary_plant_lab.html",
+        lab_reports=refinary_lab_reports,
+        additional_tests=refinary_additional_tests,
+        title="Refinary plant laboratory report",
+    )
+
+@app.route("/reports/1/edit/<int:report_id>", methods=["GET", "POST"])
 @login_required
-def forms():
+def edit_refinary_plant_lab(report_id: int):
+    """
+    
     """
 
+    report = next((row for row in refinary_lab_reports if \
+                    row["report_id"] == int(report_id)), None)
+
+    if request.method == "POST":
+
+        print(report)
+
+        flash("message", "warning")
+        return redirect(url_for("refinary_plant_lab"))
+
+    return render_template(
+        "edit_refinary_plant_lab.html",
+        report=report,
+        title="Refinary plant laboratory report",
+    )
+
+@app.route("/reports/1/approve/<int:report_id>", methods=["GET", "POST"])
+@login_required
+def approve_refinary_plant_lab(report_id: int):
+    """
+    
+    """
+
+    report = next((row for row in refinary_lab_reports if \
+                    row["report_id"] == int(report_id)), None)
+
+    if request.method == "POST":
+
+        color = ""
+        message = ""
+        form_data = dict(request.form)
+
+        if form_data["approve"] == "approved":
+            color = "success"
+            report["approved"] = "approved"
+            message = "Plant lab report has been approved!"
+        else:
+            color = "danger"
+            report["approved"] = "reject"
+            report["approve_note"] = form_data["note"]
+            message = "Plant lab report has been rejected!"
+
+        flash(message, color)
+        return redirect(url_for("refinary_plant_lab"))
+
+    return render_template(
+        "approve_refinary_plant_lab.html",
+        report=report,
+        title="Refinary plant laboratory report",
+    )
+
+@app.route("/reports/2", methods=["GET"])
+@login_required
+def fractionation_plant_lab():
+    """
+    
     """
 
     return render_template(
-        "forms.html",
-        title="Forms",
-        forms=all_forms,
+        "fractionation_plant_lab.html",
+        lab_reports=[],
+        additional_tests=[],
+        title="Fractionation plant laboratory report",
     )
 
-@app.route("/form/create", methods=["POST"])
+"""
+Dynamic forms
+"""
+
+@app.route("/forms", methods=["GET", "POST"])
 @login_required
-def form_create():
+def index_1():
     """
 
     """
+
+    with open("assets/all_forms.json") as file:
+        all_forms = json.load(file)
 
     if request.method == "POST":
         current_date = datetime.now()
         form_data = dict(request.form)
-        form_tabbed = True if "tabbed-section" in form_data else False
 
-        new_form = dict(
-                        created_by="petergich",
-                        form_tabbed=form_tabbed,
-                        form_id=len(all_forms) + 1,
-                        next_due=False,
-                        form_title=form_data["form-title"],
-                        form_description=form_data["description"],
-                        created_on=current_date.strftime("%Y-%m-%d"),
-                    )
+        new_form = {
+            "form_id": len(all_forms) + 1,
+            "form_title": form_data["form_title"],
+            "form_description": form_data["form_description"],
+            "date_created": current_date.strftime("%Y-%m-%d"),
+            "sections": [],
+        }
 
         all_forms.append(new_form)
 
-    flash("Form successfully added!", "success")
-    return redirect(url_for("forms"))
+        with open("assets/all_forms.json", "w") as file:
+            json.dump(all_forms, file)
+
+        flash("New form successfully created", "success")
+        return redirect(url_for("index_1"))
+
+    return render_template(
+        "dynamic/home.html",
+        all_forms=all_forms,
+        title="All Forms",
+    )
 
 @app.route("/form/<int:form_id>/edit", methods=["GET", "POST"])
 @login_required
-def form_edit(form_id: int):
+def form_edit_1(form_id: int):
     """
 
     """
 
-    if request.method == "POST":
+    with open("assets/all_forms.json") as file:
+        all_forms = json.load(file)
 
-        form_data = dict(request.form)
-
-        if "type" in form_data and form_data["type"] == "section":
-
-            new_section = dict(
-                            form_id=form_id,
-                            defaults_keys=[],
-                            section_id=len(all_sections) +1,
-                            section_type=form_data["section_type"],
-                            section_title=form_data["section_title"],
-                            section_description=form_data["section_description"],
-                            questions=[],
-                        )
-            all_sections.append(new_section)
-
-        elif "type" in form_data and form_data["type"] == "question":
-            current_section = next((section for section in all_sections if \
-                    section["section_id"] == int(form_data["section_id"])), None)
-
-            new_question = dict(
-                                question_title=form_data["question_title"],
-                                answer_type=form_data["answer_type"],
-                            )
-
-            current_section["questions"].append(new_question)
-
-    all_forms.sort(key=lambda x: x.get("form_id"))
-    form = next((form for form in all_forms if \
-                    form["form_id"] == int(form_id)), None)
-
-    test_sections = [
-        {
-            "form_id": form_id,
-            "section_id": 1,
-            "section_type": "type_a",
-            "section_title": "Section A",
-            "section_description": "Little description here",
-            "questions": [
-                {
-                    "question_title": "First Name",
-                    "answer_type": "text",
-                },
-                {
-                    "question_title": "Last Name",
-                    "answer_type": "text",
-                },
-                {
-                    "question_title": "Age",
-                    "answer_type": "number",
-                },
-            ],
-        },
-        {
-            "form_id": form_id,
-            "section_id": 2,
-            "section_type": "type_b",
-            "section_title": "Section B",
-            "section_description": "Guear details",
-            "defaults_keys": [
-                {
-                    "key_name": "Guard Name",
-                    "values": ["Peter Gichia", "Kevin Hart"],
-                },
-                {
-                    "key_name": "Position",
-                    "values": ["Manager", "Sub"],
-                },
-            ],
-            "questions": [
-                {
-                    "question_title": "Gate No",
-                    "answer_type": "text",
-                },
-                {
-                    "question_title": "Supervisor",
-                    "answer_type": "text",
-                },
-                {
-                    "question_title": "Time of day",
-                    "answer_type": "number",
-                },
-            ],
-        },
-    ]
-
-    # sections = [section for section in test_sections if section["form_id"] == form_id]
-    sections = [section for section in all_sections if section["form_id"] == form_id]
-
-    return render_template(
-        "form_edit.html",
-        form=form,
-        sections=sections,
-        questions=[],
-        title=form["form_title"],
-    )
-
-@app.route("/section/<int:form_id>/defaults", methods=["POST"])
-@login_required
-def add_defaults(form_id: int):
-    """
-
-    """
+    form = next((row for row in all_forms if \
+                    row["form_id"] == int(form_id)), None)
 
     if request.method == "POST":
 
         message = ""
+        current_date = datetime.now()
         form_data = dict(request.form)
 
-        current_section = next((section for section in all_sections if \
-                section["section_id"] == int(form_data["section_id"])), None)
+        if "type" in form_data and form_data["type"] == "section":
+            new_section = {
+                    "section_id": len(form["sections"]) + 1,
+                    "section_title": form_data["section_title"],
+                    "date_created": current_date.strftime("%Y-%m-%d"),
+                    "section_type": form_data["section_type"],
+                    "section_description": form_data["section_description"],
+                    "questions_per_row": int(form_data["questions_per_row"]),
+                    "questions": [],
+                    "answers": [],
+                }
 
-        if "type" in form_data and form_data["type"] == "key":
-
-            new_default = dict(key_name=form_data["default_title"], values=[])
-            current_section["defaults_keys"].append(new_default)
-
-            message = "New default key added."
-
+            form["sections"].append(new_section)
+            message = "New section successfully created"
         else:
+            current_section = next((section for section in form["sections"] if \
+                    section["section_id"] == int(form_data["section_id"])), None)
 
-            i = 0
-            for key in current_section["defaults_keys"]:
-                if key["key_name"] == form_data["key_name"]:
-                    current_section["defaults_keys"][i]["values"].append(form_data["default_value"])
-                i += 1
+            new_question = {
+                        "question_title": form_data["question_title"],
+                        "answer_type": form_data["answer_type"],
+                        "question_slug": slugify(form_data["question_title"]),
+                    }
 
-            message = "New default value added."
+            current_section["questions"].append(new_question)
+            message = "New question successfully created"
 
-    flash(message, "success")
-    return redirect(url_for("form_edit", form_id=form_id))
+        with open("assets/all_forms.json", "w") as file:
+            json.dump(all_forms, file)
+
+        flash(message, "success")
+        return redirect(url_for("form_edit_1", form_id=form["form_id"]))
+
+    return render_template(
+        "dynamic/edit.html",
+        form=form,
+        title=form["form_title"],
+    )
 
 @app.route("/form/<int:form_id>/fill", methods=["GET", "POST"])
 @login_required
-def form_fill(form_id: int):
+def form_fill_1(form_id: int):
     """
 
     """
 
-    all_forms.sort(key=lambda x: x.get("form_id"))
+    with open("assets/all_forms.json") as file:
+        all_forms = json.load(file)
 
-    form = next((form for form in all_forms if \
-                    form["form_id"] == int(form_id)), None)
+    form = next((row for row in all_forms if \
+                    row["form_id"] == int(form_id)), None)
 
-    sections = [section for section in all_sections if section["form_id"] == form_id]
+    if request.method == "POST":
+        form_data = dict(request.form)
+        current_section = next((section for section in form["sections"] if \
+                    section["section_id"] == int(form_data["section_id"])), None)
+    
+        form_data.pop("section_id")    
+        
+        current_section["answers"].append(form_data)
+
+        with open("assets/all_forms.json", "w") as file:
+            json.dump(all_forms, file)
+
+        flash("Form successfully filled", "success")
+        return redirect(url_for("form_fill_1", form_id=form["form_id"]))
 
     return render_template(
-        "form_fill.html",
+        "dynamic/fill.html",
         form=form,
-        sections=sections,
         title=form["form_title"],
     )
+
 
 
 if __name__ == "__main__":

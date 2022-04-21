@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <a href="{{ url_for('refinary_plant_lab') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back 
+                </a>
+            </div>
+            <h4 class="page-title">{{ title }}</h4>
+        </div>
+    </div>
+</div>     
+<!-- end page title -->
+
+<!-- Refinary plant lab report -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h4 class="header-title text-primary">Report - Submitted by 'Peter Gichia' on '2022-04-19'</h4>
+                        <p class="text-muted">Previously submitted lab reports.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="mb-3 col-md-3">
+                        <span for="time" class="font-12">Time</span>
+                        <input type="time" id="time" name="time" class="form-control" required value="{{ report.time }}">
+                    </div>
+
+                    <div class="mb-3 col-md-5">
+                        <span class="font-12">% FFA-specs-0.065%max- Palm oil, Sunflower and Soybean oil 0.09 % max- Corn oil</span>
+                        <input type="number" id="ffa-specs" name="ffa-specs" class="form-control" value="{{ report.ffa_specs }}">
+                    </div>
+
+                    <div class="mb-3 col-md-4">
+                        <span class="font-12">RED-specs -3.0max -Palm oil 1.0max-S/flwr 2.0 max-Corn &  Soybean oils</span>
+                        <input type="number" id="red-specs" name="red-specs" class="form-control" required value="{{ report.red_specs }}">
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="mb-3 col-md-4">
+                        <span class="font-12">YELLOW-specs 70 max-Palm  10 max S/flwr  15 max-Corn & S/bean</span>
+                        <input type="number" id="yellow-specs" name="yellow-specs" class="form-control" required value="{{ report.yellow_specs }}">
+                    </div>
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">ODOUR-characteristic of specific oil</span>
+                        <input type="text" id="odour" name="odour" class="form-control" required value="{{ report.odour }}">
+                    </div>
+
+                    <div class="mb-3 col-md-2">
+                        <span class="font-12">VISIBLE IMP-Nil</span>
+                        <input type="text" id="visible-imp-1" name="visible-imp-1" class="form-control" value="{{ report.visible_imp_1 }}">
+                    </div>
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">FLOW
+                            RATE-L/HR</span>
+                        <input type="number" id="flow-rate" name="flow-rate" class="form-control" value="{{ report.flow_rate }}">
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">FINAL OIL
+                            TEMP, °C 60-70-P1   35-50- P2</span>
+                        <input type="number" id="final-oil-temp" name="final-oil-temp" class="form-control" value="{{ report.final_oil_temp }}">
+                    </div>
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">% FFA-   2.5 min-P1  0.2max -P2</span>
+                        <input type="number" id="ffa" name="ffa" class="form-control" value="{{ report.ffa }}">
+                    </div>
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">RED-70 max</span>
+                        <input type="number" id="red-70" name="red-70" class="form-control" value="{{ report.red_70 }}">
+                    </div>
+
+                    <div class="mb-3 col-md-3">
+                        <span class="font-12">VISIBLE IMP-Nil</span>
+                        <input type="text" id="visible-imp-2" name="visible-imp-2" class="form-control" value="{{ report.visible_imp_2 }}">
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="mb-3 col-md-4">
+                        <span class="font-12">BLEACH TEMP°C  100-115</span>
+                        <input type="number" id="bleach-temp" name="bleach-temp" class="form-control" value="{{ report.bleach_temp }}">
+                    </div>
+
+                    <div class="mb-3 col-md-4">
+                        <span class="font-12">DEOD
+                            TEMP°C 250-275-P1>260-P2</span>
+                        <input type="number" id="deod-temp" name="deod-temp" class="form-control" value="{{ report.deod_temp }}">
+                    </div>
+
+                    <div class="mb-3 col-md-4">
+                        <span class="font-12">Comments</span>
+                        <textarea class="form-control" name="comments" id="comments" cols="30" rows="1">{{ report.comments }}</textarea>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end refinary plant lab report -->
+
+{% endblock content %}

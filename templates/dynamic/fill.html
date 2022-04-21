@@ -1,0 +1,240 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <a href="{{ url_for('index_1') }}" class="btn btn-dark">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+            <h4 class="page-title text-primary">Fill form - {{ title }}</h4>
+        </div>
+    </div>
+</div>
+<!-- end page title -->
+
+
+{% if form.sections %}
+    {% for section in form.sections %}
+        {% if section.section_type == 'qna' %}
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <h4 class="header-title"> {{ section.section_title }} </h4>
+                                    <p class="text-muted"> {{ section.section_description }} </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-sm-right">
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if section.questions %}
+                                <form action="{{ url_for('form_fill_1', form_id=form.form_id) }}" method="post" class="form-horizontal">
+                                    <input type="hidden" name="section_id" value="{{ section.section_id }}">
+                                    <div class="row">
+                                        {% for question in section.questions %}
+                                            <div class="col-md-{{ section.questions_per_row }}">
+                                                <div class="row mb-3">
+                                                    <label
+                                                        for="input{{ question.question_slug }}" 
+                                                        class="col-3 col-form-label"
+                                                    >{{ question.question_title }}</label>
+                                                    <div class="col-9">
+                                                        <input 
+                                                            class="form-control"
+                                                            type="{{ question.answer_type }}"
+                                                            name="{{ question.question_slug }}"
+                                                            id="input{{ question.question_slug }}"
+                                                            placeholder="{{ question.question_title }}"
+                                                            value="{{ section.answers[-1]['question.question_slug'] }}"
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div class="justify-content-end">
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fas fa-paper-plane"></i> Submit</button>
+                                    </div>
+                                </form>
+                            {% endif %}
+            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <h4 class="header-title"> {{ section.section_title }} </h4>
+                                    <p class="text-muted"> {{ section.section_description }} </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-sm-right">
+                                        <button 
+                                            type="button"
+                                            class="btn btn-primary mr-1" 
+                                            data-toggle="modal" 
+                                            data-target="#modal-{{ section.section_id }}"> 
+                                            <i class="fas fa-plus"></i> Add new
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion custom-accordion" id="custom-accordion-{{ section.section_id }}">
+                                <div class="card mb-0">
+                                    <div class="card-header" id="heading{{ section.section_id }}">
+                                        <h5 class="m-0">
+                                            <a class="custom-accordion-title d-block py-1"
+                                                data-toggle="collapse" href="#collapse{{ section.section_id }}"
+                                                aria-expanded="true" aria-controls="collapse{{ section.section_id }}">
+                                                Show submitted responses <i
+                                                    class="fas fa-chevron-down accordion-arrow"></i>
+                                            </a>
+                                        </h5>
+                                    </div>
+                                        
+                                    <div id="collapse{{ section.section_id }}" class="collapse"
+                                        aria-labelledby="heading{{ section.section_id }}"
+                                        data-parent="#custom-accordion-{{ section.section_id }}">
+                                        <div class="card-body">
+                                            {% if section.questions %}
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                {% for question in section.questions %}
+                                                                    <th>{{ question.question_title }}</th>
+                                                                {% endfor %}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% if section.answers %}
+                                                                {% for answer in section.answers %}
+                                                                    <tr>
+                                                                        {% for key, value in answer.items() %}
+                                                                            <td>{{ value }}</td>
+                                                                        {% endfor %}
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<!-- Add details modal -->
+{% if form.sections %}
+    {% for section in form.sections %}
+        {% if section.section_type != 'qna' %}
+            {% if section.questions_per_row == 12 %}
+                <div class="modal fade" id="modal-{{ section.section_id }}" tabindex="-1" role="dialog" aria-labelledby="{{ section.section_id }}ModalTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="{{ section.section_id }}ModalTitle">
+                                    Fill {{ section.section_title }} details
+                                </h5>
+                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ url_for('form_fill_1', form_id=form.form_id) }}" method="post">
+                                    <input type="hidden" name="section_id" value="{{ section.section_id }}">
+                
+                                    {% if section.questions %}
+                                        {% for question in section.questions %}
+                                            <div class="mb-3">
+                                                <label for="form-title" class="form-label">{{ question.question_title }}</label>
+                                                <input 
+                                                    name="{{ question.question_slug }}" 
+                                                    class="form-control" 
+                                                    type="{{ question.answer_type }}" id="form-title" required placeholder="{{ question.question_title }}">
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if section.questions %}
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane"></i> Save</button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div>
+            {% else %}
+                <div class="modal fade" id="modal-{{ section.section_id }}" tabindex="-1" role="dialog" aria-labelledby="{{ section.section_id }}ModalTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-full-width">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="{{ section.section_id }}ModalTitle">
+                                    Fill {{ section.section_title }} details
+                                </h5>
+                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{ url_for('form_fill_1', form_id=form.form_id) }}" method="post">
+                                    <input type="hidden" name="section_id" value="{{ section.section_id }}">
+                
+                                    {% if section.questions %}
+                                        <div class="row">
+                                            {% for question in section.questions %}
+                                                <div class="mb-3 col-md-{{ section.questions_per_row }}">
+                                                    <label for="form-title" class="form-label">{{ question.question_title }}</label>
+                                                    <input 
+                                                        name="{{ question.question_slug }}" 
+                                                        class="form-control" 
+                                                        type="{{ question.answer_type }}" id="form-title" required placeholder="{{ question.question_title }}">
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% if section.questions %}
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-paper-plane"></i> Save</button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+<!-- /.modal -->
+
+
+{% endblock content %}

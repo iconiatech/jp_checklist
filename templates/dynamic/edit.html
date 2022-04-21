@@ -1,0 +1,238 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <button 
+                    type="button"
+                    class="btn btn-primary mr-1" 
+                    data-toggle="modal" 
+                    data-target="#scrollable-modal"> 
+                    <i class="fas fa-chalkboard"></i> Add new section
+                </button>
+                <button
+                    type="button"
+                    data-toggle="modal" 
+                    data-target="#question-modal" 
+                    class="btn btn-info mr-1">
+                    <i class="fas fa-question"></i> Add new question
+                </button>
+                <a href="{{ url_for('index_1') }}" class="btn btn-dark">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+            <h4 class="page-title text-warning">Edit form - {{ title }}</h4>
+        </div>
+    </div>
+</div>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title mb-4"> ({{ form.sections|length }}) Sections in '{{ title }}'</h4>
+
+                {% if form.sections %}
+                    {% for section in form.sections %}
+                        {% if section.section_type == 'qna' %}
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <h4 class="header-title"> {{ section.section_title }} </h4>
+                                                    <p class="text-muted"> {{ section.section_description }} </p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="text-sm-right">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                            
+                                            {% if section.questions %}
+                                                <form class="form-horizontal">
+                                                    <div class="row">
+                                                        {% for question in section.questions %}
+                                                            <div class="col-md-{{ section.questions_per_row }}">
+                                                                <div class="row mb-3">
+                                                                    <label for="input{{ question.question_slug }}" class="col-3 col-form-label">{{ question.question_title }}</label>
+                                                                    <div class="col-9">
+                                                                        <input type="{{ question.answer_type }}" class="form-control" name="{{ question.question_slug }}" id="input{{ question.question_slug }}" placeholder="{{ question.question_title }}">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </form>
+                                            {% endif %}
+                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <h4 class="header-title"> {{ section.section_title }} </h4>
+                                                    <p class="text-muted"> {{ section.section_description }} </p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="text-sm-right">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                            
+                                            {% if section.questions %}
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                {% for question in section.questions %}
+                                                                    <th>{{ question.question_title }}</th>
+                                                                {% endfor %}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% endif %}
+                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add secion modal -->
+<div class="modal fade" id="scrollable-modal" tabindex="-1" role="dialog" aria-labelledby="scrollableModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scrollableModalTitle">Add new section to form</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('form_edit_1', form_id=form.form_id) }}" method="post">
+
+                    <input type="hidden" name="type" value="section">
+
+                    <div class="mb-3">
+                        <label>Title</label>
+                        <input 
+                            type="text" 
+                            name="section_title" 
+                            class="form-control" required placeholder="Provide a tile for the section">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="example-select" class="form-label">Type of section</label>
+                        <select class="form-control" name="section_type">
+                            <option value="tabular">Tabular data</option>
+                            <option value="qna">Question &amp; answer</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="example-select" class="form-label">Number of questions per row</label>
+                        <select class="form-control" name="questions_per_row">
+                            <option value="12">1</option>
+                            <option value="6">2</option>
+                            <option value="4">3</option>
+                            <option value="3">4</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Description</label>
+                        <textarea 
+                            class="form-control" 
+                            name="section_description" cols="30" rows="5" required placeholder="Write something"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create section</button>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Add question modal -->
+<div class="modal fade" id="question-modal" tabindex="-1" role="dialog" aria-labelledby="questionModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionModalTitle">Add new question to a section</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ url_for('form_edit_1', form_id=form.form_id) }}" method="post">
+
+                    <input type="hidden" name="type" value="question">
+
+                    <div class="mb-3">
+                        <label for="example-select" class="form-label">Section to be added to</label>
+                        <select class="form-control" name="section_id">
+                            {% if form.sections %}
+                                {% for section in form.sections %}
+                                    <option value="{{ section.section_id }}">{{ section.section_title }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Title</label>
+                        <input 
+                            type="text" 
+                            name="question_title" 
+                            class="form-control" required placeholder="Provide a short title for the question">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="example-select" class="form-label">Answer type</label>
+                        <select class="form-control" name="answer_type">
+                            <option value="text">Text</option>
+                            <option value="number">Number</option>
+                            <option value="date">Date</option>
+                            <option value="time">Time</option>
+                            <option value="datetime-local">Date and time</option>
+                            <option value="file">File</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create question</button>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% endblock content %}
