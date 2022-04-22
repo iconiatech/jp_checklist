@@ -2,8 +2,10 @@
 
 """
 
+import os
 import json
 
+from emails import send_email
 from datetime import datetime
 from slugify import slugify
 from flask_bcrypt import Bcrypt
@@ -483,6 +485,110 @@ def form_fill_1(form_id: int):
         title=form["form_title"],
     )
 
+@app.route("/form/<int:form_id>/fill2", methods=["GET", "POST"])
+@login_required
+def form_fill_2(form_id: int):
+    """
+
+    """
+
+    with open("assets/all_forms.json") as file:
+        all_forms = json.load(file)
+
+    form = next((row for row in all_forms if \
+                    row["form_id"] == int(form_id)), None)
+
+    if request.method == "POST":
+        form_data = dict(request.form)
+        current_section = next((section for section in form["sections"] if \
+                    section["section_id"] == int(form_data["section_id"])), None)
+    
+        form_data.pop("section_id")    
+        
+        current_section["answers"].append(form_data)
+
+        with open("assets/all_forms.json", "w") as file:
+            json.dump(all_forms, file)
+
+        flash("Form successfully filled", "success")
+        return redirect(url_for("form_fill_2", form_id=form["form_id"]))
+
+    return render_template(
+        "dynamic/fill2.html",
+        form=form,
+        title=form["form_title"],
+    )
+
+@app.route("/form/<int:form_id>/view", methods=["GET"])
+@login_required
+def form_view(form_id: int):
+    """
+    
+    """
+
+    with open("assets/all_forms.json") as file:
+        all_forms = json.load(file)
+
+    form = next((row for row in all_forms if \
+                    row["form_id"] == int(form_id)), None)
+
+    qna_answer = {}
+
+    for section in form["sections"]:
+        if section["section_type"] == "qna" and len(section["answers"]) > 0:
+            qna_answer = section["answers"][0]
+            break
+
+    return render_template(
+        "dynamic/view.html",
+        form=form,
+        qna_answer=qna_answer,
+        title=form["form_title"],
+    ) 
+
+@app.route("/form/<int:form_id>/submit", methods=["POST"])
+@login_required
+def form_submit(form_id: int):
+    """
+    
+    """
+
+    with open("assets/all_forms.json") as file:
+        all_forms = json.load(file)
+
+    form = next((row for row in all_forms if \
+                    row["form_id"] == int(form_id)), None)
+
+    if request.method == "POST":
+        current_date = datetime.now()
+
+        if os.getenv("SMTP_SERVER"):
+            subject = f"{form['form_title']} - report has been submitted"
+            text = f"""
+                <p>User '{current_user.username}' has submitted the report '{form['form_title']}'
+                on '{current_date.strftime("%Y-%m-%d")}'.</p>
+                <br>
+                <p>To access the submitted report, copy the link below 
+                    and paste it on a browser and hit the Enter button.</p>
+                <br>
+
+                Copy this link and paste on browser: <strong>http://localhost:4000/form/{form_id}/view</strong>
+            """
+
+            send_email(
+                subject=subject,
+                email_body=text,
+                receiver_email=os.getenv("RECIEVER_EMAIL"),
+                sender_email=os.getenv("SENDER_EMAIL"),
+                sender_server=os.getenv("SMTP_SERVER"),
+                sender_password=os.getenv("EMAIL_PASSWORD"),
+                salutation="Hello",
+            )
+
+            print("Email sent")
+
+        flash("Your form has been successfully submitted", "success")
+        return redirect(url_for("index_1"))
 
 
 if __name__ == "__main__":

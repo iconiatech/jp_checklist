@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- start page title -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box">
+            <div class="page-title-right">
+                <a href="{{ url_for('index_1') }}" class="btn btn-dark">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+            <h4 class="page-title text-warning text-center">
+                Form Name: {{ title }} <strong class="ml-5">Submitted by: Peter Gichia</strong></h4>
+        </div>
+    </div>
+</div>
+<!-- end page title -->
+
+
+{% if form.sections %}
+    {% for section in form.sections %}
+        {% if section.section_type == 'qna' %}
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-12 text-center bg-primary text-white py-1">
+                                    <h4 class="header-title m-0"> {{ section.section_title }} </h4>
+                                </div>
+                            </div>
+
+                            {% if section.questions %}
+                                <form action="{{ url_for('form_fill_1', form_id=form.form_id) }}" method="post" class="form-horizontal">
+                                    <input type="hidden" name="section_id" value="{{ section.section_id }}">
+                                    <div class="row">
+                                        {% for key, value in qna_answer.items() %}
+                                            <div class="col-md-{{ section.questions_per_row }}">
+                                                <div class="row mb-3">
+                                                    <label
+                                                        for="input{{ key}}" 
+                                                        class="col-3 col-form-label"
+                                                    >{{ key }}</label>
+                                                    <div class="col-9">
+                                                        <input
+                                                            disabled
+                                                            class="form-control"
+                                                            type="text"
+                                                            name="{{ key}}"
+                                                            id="input{{ key}}"
+                                                            placeholder="{{ key }}"
+                                                            value="{{ value }}"
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                </form>
+                            {% endif %}
+            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            
+                            <div class="row mb-4 text-center">
+                                <div class="col-md-12">
+                                    <div class="bg-primary text-white py-1 mb-3">
+                                        <h4 class="header-title m-0"> {{ section.section_title }} </h4>
+                                    </div>
+                                    <!-- <button 
+                                            type="button"
+                                            class="btn btn-primary mr-1" 
+                                            data-toggle="modal" 
+                                            data-target="#modal-{{ section.section_id }}"> 
+                                            <i class="fas fa-plus"></i> Enter Rows
+                                    </button> -->
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    {% if section.questions %}
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        {% for question in section.questions %}
+                                                            <th>{{ question.question_title }}</th>
+                                                        {% endfor %}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% if section.answers %}
+                                                        {% for answer in section.answers %}
+                                                            <tr>
+                                                                {% for key, value in answer.items() %}
+                                                                    <td>{{ value }}</td>
+                                                                {% endfor %}
+                                                            </tr>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+    
+            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+
+{% endblock content %}
